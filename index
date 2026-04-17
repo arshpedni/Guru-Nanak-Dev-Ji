@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Life & Legacy of Guru Nanak Dev Ji</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Warm Neutrals & Amber Accent (Background: #faf8f5, Text: #1e293b, Accents: #b45309, #d97706, #fcd34d) -->
+    <!-- Application Structure Plan: A tab-based Single Page Application (SPA) structured around the four main phases/aspects of the report (Early Life, Journeys, Teachings, Legacy). This structure allows users to digest the spiritual and historical narrative in focused, non-overwhelming segments. The interactive journey map (chart) and clickable teaching pillars encourage active exploration of qualitative data. -->
+    <!-- Visualization & Content Choices: 1. Timeline (HTML/Tailwind) for Early Life to show progression. 2. Polar Area Chart (Chart.js) for The Udasis to conceptually represent the equal spread of his teachings in 4 cardinal directions, tied to interactive detail panels. 3. Interactive Grid Cards (HTML/JS) for Core Teachings to compartmentalize the 3 pillars for focused reading. Confirming NO SVG or Mermaid used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf8f5;
+            color: #1e293b;
+        }
+        h1, h2, h3, .serif-text {
+            font-family: 'Lora', serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 40vh;
+            max-height: 400px;
+            min-height: 300px;
+        }
+        .nav-btn.active {
+            border-bottom: 2px solid #b45309;
+            color: #b45309;
+            font-weight: 600;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pillar-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .pillar-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .timeline-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: #d97706;
+            position: absolute;
+            left: -8px;
+            top: 6px;
+        }
+        .timeline-line {
+            position: absolute;
+            left: 0;
+            top: 24px;
+            bottom: -24px;
+            width: 2px;
+            background-color: #fde68a;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center py-4">
+                <div class="text-2xl font-bold text-amber-800 serif-text tracking-tight flex items-center gap-2">
+                    <span>📜</span> Guru Nanak Dev Ji
+                </div>
+                <nav class="mt-4 md:mt-0 flex flex-wrap justify-center gap-2 sm:gap-6" id="main-nav">
+                    <button data-target="section-intro" class="nav-btn active pb-1 text-sm sm:text-base text-slate-600 hover:text-amber-700 transition-colors">Overview</button>
+                    <button data-target="section-early" class="nav-btn pb-1 text-sm sm:text-base text-slate-600 hover:text-amber-700 transition-colors">Early Life</button>
+                    <button data-target="section-udasis" class="nav-btn pb-1 text-sm sm:text-base text-slate-600 hover:text-amber-700 transition-colors">The Udasis</button>
+                    <button data-target="section-teachings" class="nav-btn pb-1 text-sm sm:text-base text-slate-600 hover:text-amber-700 transition-colors">Teachings</button>
+                    <button data-target="section-legacy" class="nav-btn pb-1 text-sm sm:text-base text-slate-600 hover:text-amber-700 transition-colors">Legacy</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <section id="section-intro" class="content-section fade-in">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-6 leading-tight">The Life & Legacy of <br><span class="text-amber-700">Guru Nanak Dev Ji</span></h1>
+                <p class="text-lg text-slate-600 mb-8 italic">1469 – 1539</p>
+                <div class="bg-amber-50 border-l-4 border-amber-500 p-6 rounded-r-lg shadow-sm text-left">
+                    <p class="text-xl serif-text text-amber-900 font-medium">"Truth is the highest virtue, but higher still is truthful living."</p>
+                </div>
+            </div>
+            
+            <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-100">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4 serif-text flex items-center gap-2"><span>🌿</span> About This Interactive Application</h2>
+                <p class="text-slate-600 leading-relaxed mb-4">
+                    This interactive dashboard is designed to help you explore the profound life, extensive travels, and enduring philosophies of Guru Nanak Dev Ji. Rather than reading a static text, you can navigate through thematic sections to uncover the historical context and spiritual significance of his journey.
+                </p>
+                <p class="text-slate-600 leading-relaxed">
+                    Use the navigation menu above to explore his early life milestones, interact with a conceptual map of his global journeys (Udasis), discover the three foundational pillars of his teachings, and reflect on his lasting legacy.
+                </p>
+            </div>
+        </section>
+
+        <section id="section-early" class="content-section hidden">
+            <div class="mb-10">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4 serif-text flex items-center gap-2"><span>🌅</span> Early Life & Key Events</h2>
+                <p class="text-slate-600 text-lg leading-relaxed">
+                    This section details the formative years and pivotal moments of Guru Nanak's early life. Follow the timeline below to understand his origins and the events that sparked his spiritual revolution.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100">
+                    <h3 class="text-xl font-bold text-amber-800 mb-4 border-b pb-2">Origins</h3>
+                    <ul class="space-y-4 text-slate-700">
+                        <li class="flex items-start">
+                            <span class="mr-2 mt-1 text-amber-600">📅</span>
+                            <div><strong>Birth:</strong> April 15, 1469 (celebrated as Gurpurab in Kartik).</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-2 mt-1 text-amber-600">📍</span>
+                            <div><strong>Place:</strong> Rai Bhoi Ki Talwandi (now Nankana Sahib, Pakistan).</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-2 mt-1 text-amber-600">👨‍👩‍👦</span>
+                            <div><strong>Parents:</strong> Mehta Kalu (father) and Mata Tripta (mother).</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-2 mt-1 text-amber-600">✨</span>
+                            <div><strong>Early Signs:</strong> From childhood, showed deep interest in spiritual matters, questioning rituals and caste.</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="relative pl-6">
+                    
+                    <div class="relative pb-8">
+                        <div class="timeline-line"></div>
+                        <div class="timeline-dot"></div>
+                        <h4 class="text-lg font-bold text-slate-800 mb-1">Age 11: The Sacred Thread</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed">Refused to wear the ritualistic Janeu thread, arguing that a person should be defined by actions and mercy, not a string.</p>
+                    </div>
+
+                    <div class="relative pb-8">
+                        <div class="timeline-line"></div>
+                        <div class="timeline-dot"></div>
+                        <h4 class="text-lg font-bold text-slate-800 mb-1 flex items-center gap-2"><span>🍞</span> Sacha Sauda (True Bargain)</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed">Given 20 rupees by his father for business. Instead, he used it to feed hungry wandering saints, defining this as the "True Bargain."</p>
+                    </div>
+
+                    <div class="relative pb-8">
+                        <div class="timeline-line"></div>
+                        <div class="timeline-dot"></div>
+                        <h4 class="text-lg font-bold text-slate-800 mb-1">Sultanpur Lodhi</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed">Worked as a storekeeper while living with his sister, Bebe Nanaki. Spent mornings meditating by the Kali Bein river.</p>
+                    </div>
+
+                    <div class="relative">
+                        <div class="timeline-dot bg-amber-800"></div>
+                        <h4 class="text-lg font-bold text-amber-800 mb-1">The Divine Enlightenment</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed mb-2">Disappeared for three days in the Kali Bein river. Emerged with a profound realization:</p>
+                        <blockquote class="bg-slate-50 p-3 rounded border-l-4 border-amber-800 text-slate-700 italic text-sm">
+                            "Na Ko Hindu, Na Ko Musalman"<br>
+                            <span class="text-xs text-slate-500">(There is no Hindu, there is no Muslim)</span>
+                        </blockquote>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section id="section-udasis" class="content-section hidden">
+            <div class="mb-10">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4 serif-text flex items-center gap-2"><span>👣</span> The Udasis (Long Journeys)</h2>
+                <p class="text-slate-600 text-lg leading-relaxed">
+                    This section visualizes the massive scale of Guru Nanak's travels over nearly 20 years. Interact with the directional chart below to explore the specific regions he visited and the unique purpose of his message in each direction. He traveled on foot, accompanied by Bhai Mardana playing the Rebab.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100">
+                
+                <div class="w-full flex flex-col items-center">
+                    <p class="text-sm text-slate-500 mb-2 uppercase tracking-widest font-semibold">Interactive Journey Map</p>
+                    <p class="text-xs text-slate-400 mb-4 text-center">Click a direction slice to view details</p>
+                    <div class="chart-container">
+                        <canvas id="udasiChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-6 md:p-8 rounded-xl h-full border border-slate-200 flex flex-col justify-center transition-all" id="udasi-details-container">
+                    <div class="text-center mb-6">
+                        <span class="text-4xl" id="udasi-icon">🧭</span>
+                        <h3 class="text-2xl font-bold text-slate-800 mt-2 serif-text" id="udasi-title">Select a Direction</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Major Destinations</h4>
+                            <p class="text-slate-800 font-medium text-lg" id="udasi-destinations">Interact with the chart to see locations.</p>
+                        </div>
+                        <div class="h-px w-full bg-slate-200"></div>
+                        <div>
+                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Purpose & Message</h4>
+                            <p class="text-slate-600 leading-relaxed" id="udasi-purpose">Discover the core discussions and teachings shared in this region.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="section-teachings" class="content-section hidden">
+            <div class="mb-10">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4 serif-text flex items-center gap-2"><span>📖</span> Core Teachings</h2>
+                <p class="text-slate-600 text-lg leading-relaxed">
+                    This section distills Guru Nanak's vast philosophy into its core components. Explore the "Three Pillars" of a truthful life and the fundamental concepts that form the basis of his worldview. Click on the pillars below for details.
+                </p>
+            </div>
+
+            <div class="mb-12">
+                <h3 class="text-2xl font-bold text-center text-amber-800 mb-8 serif-text">The Three Pillars</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    
+                    <div class="pillar-card bg-white p-6 rounded-xl shadow-md border-t-4 border-amber-500 cursor-pointer flex flex-col items-center text-center group" onclick="togglePillarDetail('naam')">
+                        <div class="w-16 h-16 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-2xl mb-4 group-hover:bg-amber-500 group-hover:text-white transition-colors">1</div>
+                        <h4 class="text-xl font-bold text-slate-800 mb-2">Naam Japo</h4>
+                        <p class="text-slate-500 text-sm mb-4">Meditation & Remembrance</p>
+                        <button class="text-amber-600 text-sm font-semibold hover:text-amber-800">Read Meaning &darr;</button>
+                        <div id="detail-naam" class="hidden mt-4 pt-4 border-t border-slate-100 text-slate-600 text-sm leading-relaxed w-full">
+                            Meditate on the name of God and remember Him at all times. It is a constant internal connection to the divine truth.
+                        </div>
+                    </div>
+
+                    <div class="pillar-card bg-white p-6 rounded-xl shadow-md border-t-4 border-amber-600 cursor-pointer flex flex-col items-center text-center group" onclick="togglePillarDetail('kirat')">
+                        <div class="w-16 h-16 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-2xl mb-4 group-hover:bg-amber-600 group-hover:text-white transition-colors">2</div>
+                        <h4 class="text-xl font-bold text-slate-800 mb-2">Kirat Karo</h4>
+                        <p class="text-slate-500 text-sm mb-4">Honest Living</p>
+                        <button class="text-amber-600 text-sm font-semibold hover:text-amber-800">Read Meaning &darr;</button>
+                        <div id="detail-kirat" class="hidden mt-4 pt-4 border-t border-slate-100 text-slate-600 text-sm leading-relaxed w-full">
+                            Earn an honest living through hard work and integrity. Spirituality is not an excuse to escape worldly responsibilities.
+                        </div>
+                    </div>
+
+                    <div class="pillar-card bg-white p-6 rounded-xl shadow-md border-t-4 border-amber-700 cursor-pointer flex flex-col items-center text-center group" onclick="togglePillarDetail('vand')">
+                        <div class="w-16 h-16 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-2xl mb-4 group-hover:bg-amber-700 group-hover:text-white transition-colors">3</div>
+                        <h4 class="text-xl font-bold text-slate-800 mb-2">Vand Chakko</h4>
+                        <p class="text-slate-500 text-sm mb-4">Sharing with Others</p>
+                        <button class="text-amber-600 text-sm font-semibold hover:text-amber-800">Read Meaning &darr;</button>
+                        <div id="detail-vand" class="hidden mt-4 pt-4 border-t border-slate-100 text-slate-600 text-sm leading-relaxed w-full">
+                            Share what you have with the needy and the community. True wealth is found in generosity and collective well-being.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="bg-slate-800 text-white rounded-xl p-8 shadow-lg">
+                <h3 class="text-2xl font-bold text-amber-400 mb-6 serif-text text-center">Fundamental Concepts</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x divide-slate-600">
+                    <div class="pt-4 md:pt-0 md:px-6 text-center">
+                        <div class="text-3xl mb-2 text-amber-200">ੴ</div>
+                        <h4 class="text-lg font-bold mb-2">Ik Onkar</h4>
+                        <p class="text-slate-300 text-sm">God is One. A unified, formless, and universal divine presence.</p>
+                    </div>
+                    <div class="pt-4 md:pt-0 md:px-6 text-center">
+                        <div class="text-3xl mb-2">⚖️</div>
+                        <h4 class="text-lg font-bold mb-2">Absolute Equality</h4>
+                        <p class="text-slate-300 text-sm">Complete rejection of the caste system and gender discrimination.</p>
+                    </div>
+                    <div class="pt-4 md:pt-0 md:px-6 text-center">
+                        <div class="text-3xl mb-2">🍲</div>
+                        <h4 class="text-lg font-bold mb-2">Langar</h4>
+                        <p class="text-slate-300 text-sm">The community kitchen where everyone sits on the floor together to eat, regardless of status.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-legacy" class="content-section hidden">
+            <div class="mb-10">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4 serif-text flex items-center gap-2"><span>🏡</span> Later Years & Legacy</h2>
+                <p class="text-slate-600 text-lg leading-relaxed">
+                    This final section explores the culmination of Guru Nanak's earthly journey, the establishment of a localized community, and the lasting revolution of logic and love he left behind.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-100">
+                    <h3 class="text-2xl font-bold text-amber-800 mb-4 serif-text">Kartarpur & Succession</h3>
+                    <ul class="space-y-6">
+                        <li class="flex items-start">
+                            <span class="text-amber-500 mr-3 text-xl">🌾</span>
+                            <p class="text-slate-700 leading-relaxed">Guru Nanak eventually settled down in <strong>Kartarpur</strong> (City of God) and lived as a farmer, demonstrating 'Kirat Karo' in practice.</p>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-amber-500 mr-3 text-xl">🤲</span>
+                            <p class="text-slate-700 leading-relaxed">He established a vibrant community of followers who lived a balanced life of deep prayer and honest manual labor.</p>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-amber-500 mr-3 text-xl">👑</span>
+                            <p class="text-slate-700 leading-relaxed"><strong>Succession:</strong> Before his passing, he tested his disciples and chose Bhai Lehna as his successor, bypassing his own sons. He renamed him <strong>Guru Angad Dev Ji</strong> (meaning "a part of one's own body").</p>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-amber-500 mr-3 text-xl">✨</span>
+                            <p class="text-slate-700 leading-relaxed"><strong>Joti Jot:</strong> He left his physical form in the year 1539.</p>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-amber-900 text-amber-50 p-8 rounded-xl shadow-lg flex flex-col justify-center relative overflow-hidden">
+                    <div class="absolute top-0 right-0 opacity-10 text-9xl transform translate-x-4 -translate-y-4">🌿</div>
+                    <h3 class="text-2xl font-bold text-amber-300 mb-6 serif-text relative z-10">Summary for Reflection</h3>
+                    <p class="text-lg leading-relaxed mb-6 relative z-10 font-light">
+                        Guru Nanak Dev Ji's life was a revolution of <strong class="text-white">love and logic</strong>. 
+                    </p>
+                    <p class="text-lg leading-relaxed relative z-10 font-light">
+                        He didn't ask people to renounce the world; he asked them to live in the world with a pure heart, serving humanity as a form of highest worship.
+                    </p>
+                    <div class="mt-8 pt-6 border-t border-amber-800 text-sm text-amber-400/80 uppercase tracking-widest relative z-10">
+                        Notes compiled for spiritual & historical study.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-6 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 text-center text-sm">
+            Interactive exploration of the life of Guru Nanak Dev Ji. Based on historical notes.
+        </div>
+    </footer>
+
+    <script>
+        const udasiData = {
+            'East': {
+                icon: '🌅',
+                title: 'Journey to the East',
+                dest: 'Haridwar, Varanasi, Assam',
+                purpose: 'Debating rituals and idol worship, showing the futility of empty ceremonies.'
+            },
+            'South': {
+                icon: '🏝️',
+                title: 'Journey to the South',
+                dest: 'Sri Lanka, Tamil Nadu',
+                purpose: 'Spreading the universal message of "One God" across different cultures.'
+            },
+            'North': {
+                icon: '🏔️',
+                title: 'Journey to the North',
+                dest: 'Tibet, Himalayas, Mount Sumeru',
+                purpose: 'Engaging in deep spiritual discussions with Siddhas and Yogis in the high mountains.'
+            },
+            'West': {
+                icon: '🕌',
+                title: 'Journey to the West',
+                dest: 'Mecca, Baghdad, Kabul',
+                purpose: 'Emphasizing that God is everywhere and omnipresent, not confined to just one specific direction.'
+            }
+        };
+
+        const navBtns = document.querySelectorAll('.nav-btn');
+        const sections = document.querySelectorAll('.content-section');
+        let chartInstance = null;
+        let chartInitialized = false;
+
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.getAttribute('data-target');
+                
+                navBtns.forEach(b => b.classList.remove('active', 'border-amber-700', 'text-amber-700'));
+                btn.classList.add('active');
+
+                sections.forEach(sec => {
+                    if(sec.id === targetId) {
+                        sec.classList.remove('hidden');
+                        sec.classList.add('fade-in');
+                    } else {
+                        sec.classList.add('hidden');
+                        sec.classList.remove('fade-in');
+                    }
+                });
+
+                if (targetId === 'section-udasis' && !chartInitialized) {
+                    initChart();
+                    chartInitialized = true;
+                }
+            });
+        });
+
+        function togglePillarDetail(id) {
+            const detailEl = document.getElementById('detail-' + id);
+            const isHidden = detailEl.classList.contains('hidden');
+            
+            document.querySelectorAll('[id^="detail-"]').forEach(el => el.classList.add('hidden'));
+            
+            if (isHidden) {
+                detailEl.classList.remove('hidden');
+                detailEl.classList.add('fade-in');
+            }
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('udasiChart').getContext('2d');
+            
+            const data = {
+                labels: ['North', 'East', 'South', 'West'],
+                datasets: [{
+                    label: 'Directional Journeys',
+                    data: [25, 25, 25, 25],
+                    backgroundColor: [
+                        'rgba(217, 119, 6, 0.7)', 
+                        'rgba(180, 83, 9, 0.7)', 
+                        'rgba(120, 53, 15, 0.7)', 
+                        'rgba(245, 158, 11, 0.7)'  
+                    ],
+                    borderColor: '#ffffff',
+                    borderWidth: 2,
+                    hoverOffset: 10
+                }]
+            };
+
+            const config = {
+                type: 'polarArea',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                font: {
+                                    family: "'Inter', sans-serif"
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ' Udasi - Click for details';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            ticks: {
+                                display: false 
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            }
+                        }
+                    },
+                    onClick: (event, elements) => {
+                        if (elements && elements.length > 0) {
+                            const index = elements[0].index;
+                            const label = data.labels[index];
+                            updateUdasiDetails(label);
+                        }
+                    }
+                }
+            };
+
+            chartInstance = new Chart(ctx, config);
+        }
+
+        function updateUdasiDetails(direction) {
+            const info = udasiData[direction];
+            if(info) {
+                const container = document.getElementById('udasi-details-container');
+                
+                container.style.opacity = 0;
+                
+                setTimeout(() => {
+                    document.getElementById('udasi-icon').textContent = info.icon;
+                    document.getElementById('udasi-title').textContent = info.title;
+                    document.getElementById('udasi-destinations').textContent = info.dest;
+                    document.getElementById('udasi-purpose').textContent = info.purpose;
+                    
+                    container.classList.add('ring-2', 'ring-amber-500', 'bg-amber-50');
+                    setTimeout(()=> {
+                         container.classList.remove('ring-2', 'ring-amber-500', 'bg-amber-50');
+                    }, 500);
+
+                    container.style.opacity = 1;
+                }, 150);
+            }
+        }
+    </script>
+</body>
+</html>
